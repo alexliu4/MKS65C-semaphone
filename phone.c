@@ -42,7 +42,7 @@ int main() {
   int shmid = shmget(KEY, 202, 0);
 
   if(shmid == -1){
-    printf("Errno 39 %d : %s\n",errno , strerror(errno ));
+    printf("Errno line 39 %d : %s\n",errno , strerror(errno ));
   }
 
   //Pointer to shared memory

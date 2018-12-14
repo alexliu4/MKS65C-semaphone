@@ -12,10 +12,11 @@ control.o: control.c
 clean:
 	rm *.o
 	rm a.out
+	rm control
 
 
 setup:
 		./control $(args)
 
-run:
+run: all
 	./a.out
