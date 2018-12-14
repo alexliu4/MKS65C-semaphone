@@ -31,7 +31,12 @@ int main() {
   sb.sem_num = 0;
   sb.sem_flg = SEM_UNDO;
   sb.sem_op = -1;
-  semop(semd, &sb, 1);
+  while(semop(semd, &sb, 1)){
+    printf("Resources currently unavailable!\n");
+    sleep(5);
+  }
+  printf("Resources are available!\n");
+
 
   //getting shared memory
   int shmid = shmget(KEY, 202, 0);
