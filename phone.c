@@ -26,15 +26,14 @@ int main() {
   semd = semget(KEY, 1, 0);
 
 
+
   //DOWNING the semaphore
   struct sembuf sb;
   sb.sem_num = 0;
   sb.sem_flg = SEM_UNDO;
   sb.sem_op = -1;
-  while(semop(semd, &sb, 1)){
-    printf("Resources currently unavailable!\n");
-    sleep(5);
-  }
+  semop(semd, &sb, 1);
+
   printf("Resources are available!\n");
 
 
