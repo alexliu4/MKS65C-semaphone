@@ -21,45 +21,52 @@ union semun {
 
 
 int main() {
+  //getting semaphore
   int semd;
   semd = semget(KEY, 1, 0);
 
 
-  //DOWNING
+  //DOWNING the semaphore
   struct sembuf sb;
   sb.sem_num = 0;
   sb.sem_flg = SEM_UNDO;
   sb.sem_op = -1;
   semop(semd, &sb, 1);
 
-
+  //getting shared memory
   int shmid = shmget(KEY, 202, 0);
 
   if(shmid == -1){
     printf("Errno 39 %d : %s\n",errno , strerror(errno ));
   }
 
+  //Pointer to shared memory
   char * shminfo = shmat(shmid, (void *)0, 0);
 
+  //Printing last line
   if(strcmp(shminfo, "")){
-    printf("the last line that was entered was: %s\n", shminfo);
+    printf("The last line that was entered was:\n %s\n", shminfo);
   }
 
 
-
+  // Prmpt user to add next line
   printf("enter what u want to add:\n");
   char line[202];
   fgets(line, 202, stdin);
-  line[strlen(line) - 2] = "\n";
   line[strlen(line) - 1] = 0;
 
   int storyfd = open("call.txt", O_WRONLY, 0);
+
+  //Copying line to shared memory
   strncpy(shminfo, line, 202);
 
+  //appending line to call.txt
   lseek(storyfd, 0, SEEK_END);
 
   write(storyfd, shminfo, strlen(line));
-  //UPPING
+  write(storyfd, "\n", 1);
+
+  //UPPING the semaphore
   sb.sem_op = 1;
   semop(semd, &sb, 1);
 

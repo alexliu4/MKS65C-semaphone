@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     if(!strcmp(argv[1], "-c")){
       printf("Creating story, shared memory, and semaphore.\n");
       // shared memory
-      int shmid = shmget(KEY, 200, 0644 | IPC_CREAT);
+      int shmid = shmget(KEY, 202, 0644 | IPC_CREAT);
       if(shmid == -1){
         printf("Errno 31 %d : %s\n",errno , strerror(errno ));
       }
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
       char * text = calloc(5000, sizeof(char));
       int rd= read(file, text, 5000);
       close(file);
-      if (rd) printf("%s\n", text );
+      if (rd) printf("%s", text );
       else printf("----No lines added----\n");
       free(text);
 
@@ -111,29 +111,12 @@ int main(int argc, char *argv[]) {
       char * text = calloc(5000, sizeof(char));
       int rd= read(file, text, 5000);
       close(file);
-      if (rd) printf("%s\n", text );
+      if (rd) printf("%s", text );
       else printf("----No lines added----\n");
       free(text);
     }
     else printf("Invalid command\n" );
   }
-
-  // int semd;
-  // int r;
-  // int v;
-  // semd = semget(KEY, 1, IPC_CREAT | IPC_EXCL | 0644);
-  // if (semd == -1) {
-  //   printf("error %d: %s\n", errno, strerror(errno));
-  //   semd = semget(KEY, 1, 0);
-  //   v = semctl(semd, 0, GETVAL, 0);
-  //   printf("semctl returned: %d\n", v);
-  // }
-  // else {
-  //   union semun us;
-  //   us.val = 3;
-  //   r = semctl(semd, 0, SETVAL, us);
-  //   printf("semctl returned: %d\n", r);
-  // }
 
   return 0;
 }
