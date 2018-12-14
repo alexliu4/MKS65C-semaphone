@@ -19,24 +19,6 @@ union semun {
   struct seminfo  *__buf;  /* Buffer for IPC_INFO */
 };
 
-void viewer(){
-  int file;
-
-  printf("Viewing story :\n");
-  file = open("call.txt" , O_RDONLY, 0644);
-  if(file < 0){
-    printf("Errno %d : %s\n",errno , strerror(errno ));
-    exit(0);
-  }
-  //reads file
-  char * text = calloc(5000, sizeof(char));
-  int rd= read(file, text, 5000);
-  close(file);
-  if (rd) printf("%s", text );
-  else printf("----No lines added----\n");
-  free(text);
-}
-
 void creator(){
   int file;
 
@@ -60,6 +42,26 @@ void creator(){
   us.val = 1;
   semctl(semid, 0, SETVAL, us);
 }
+
+
+void viewer(){
+  int file;
+
+  printf("Viewing story :\n");
+  file = open("call.txt" , O_RDONLY, 0644);
+  if(file < 0){
+    printf("Errno %d : %s\n",errno , strerror(errno ));
+    exit(0);
+  }
+  //reads file
+  char * text = calloc(5000, sizeof(char));
+  int rd= read(file, text, 5000);
+  close(file);
+  if (rd) printf("%s", text );
+  else printf("----No lines added----\n");
+  free(text);
+}
+
 
 void remover(){
   int file;
@@ -111,7 +113,6 @@ void remover(){
     printf("Errno %d : %s\n",errno , strerror(errno ));
   }
 }
-
 
 
 int main(int argc, char *argv[]) {
