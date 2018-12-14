@@ -12,12 +12,13 @@
 
 #define KEY 0xDEADBEEF
 
-// union semun {
-//   int              val;    /* Value for SETVAL */
-//   struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
-//   unsigned short  *array;  /* Array for GETALL, SETALL */
-//   struct seminfo  *__buf;  /* Buffer for IPC_INFO */
-// };
+union semun {
+  int              val;    /* Value for SETVAL */
+  struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
+  unsigned short  *array;  /* Array for GETALL, SETALL */
+  struct seminfo  *__buf;  /* Buffer for IPC_INFO */
+};
+
 
 int main(int argc, char *argv[]) {
   int file;
@@ -27,7 +28,7 @@ int main(int argc, char *argv[]) {
   else{
     //create
     if(!strcmp(argv[1], "-c")){
-
+      printf("Creating story, shared memory, and semaphore.\n");
       // shared memory
       int shmid = shmget(KEY, 200, 0644 | IPC_CREAT);
       if(shmid == -1){
@@ -43,13 +44,9 @@ int main(int argc, char *argv[]) {
       if(semid == -1){
         printf("Errno 40 %d : %s\n",errno , strerror(errno ));
       }
-      else {
-        union semun us;
-        us.val = 3;
-        int r;
-        r = semctl(shmid, 0, SETVAL, us);
-        printf("semctl returned: %d\n", r);
-      }
+      union semun us;
+      us.val = 1;
+      semctl(semid, 0, SETVAL, us);
     }
     // remove
     else if(!strcmp(argv[1], "-r")){
@@ -76,22 +73,16 @@ int main(int argc, char *argv[]) {
         printf("Errno 46 %d : %s\n",errno , strerror(errno ));
       }
 
-      // Make sure no other operations are running
-      struct sembuf* sbuf = calloc(sizeof(struct sembuf), 1);
-      sbuf->sem_num = 0;
-      sbuf->sem_op = -1;
-      sbuf->sem_flg = SEM_UNDO;
-      // This should wait until memory becomes available
-      int sem_op_status = semop(sem_desc, sbuf, 1);
-      free(sbuf);
 
       // shows content before removal
-      char text[1000];
-      int rd= read(file, text, 999);
+      char * text = calloc(5000, sizeof(char));
+      int rd= read(file, text, 5000);
       close(file);
       if (rd) printf("%s\n", text );
       else printf("----No lines added----\n");
+      free(text);
 
+      printf("\nRemoving story, shared memory, and semaphore.\n");
       // deleting shared memory
       int shmid = shmget(KEY, 200, 0644);
       if(shmid == -1){
@@ -110,17 +101,19 @@ int main(int argc, char *argv[]) {
     }
     // view
     else if(!strcmp(argv[1], "-v")){
+      printf("Viewing story :\n");
       file = open("call.txt" , O_RDONLY, 0644);
       if(file < 0){
         printf("Errno 77 %d : %s\n",errno , strerror(errno ));
         exit(0);
       }
       //reads file
-      char text[1000];
-      int rd= read(file, text, 999);
+      char * text = calloc(5000, sizeof(char));
+      int rd= read(file, text, 5000);
       close(file);
       if (rd) printf("%s\n", text );
       else printf("----No lines added----\n");
+      free(text);
     }
     else printf("Invalid command\n" );
   }
